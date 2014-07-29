@@ -11,7 +11,7 @@ namespace _2dFractal
     {
         public Color GetPointColour()
         {
-            return Color.FromRgb(100, 100, 0);
+            return Color.FromRgb(100,100,100);
         }
     }
 }

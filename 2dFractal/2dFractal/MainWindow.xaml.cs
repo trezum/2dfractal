@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,17 +37,19 @@ namespace _2dFractal
             // Create the application's main window
             //mainWindow = new Window();
             //mainWindow.Title = "Writeable Bitmap";
-            //mainWindow.Height = 200;
-            //mainWindow.Width = 200;
+            mainWindow.Height = _height;
+            mainWindow.Width = _width;
+            mainWindow.ResizeMode = ResizeMode.CanMinimize;
 
             // Define the Image element
             _random.Stretch = Stretch.None;
-            _random.Margin = new Thickness(20);
+            _random.Margin = new Thickness(0);
 
             // Define a StackPanel to host Controls
             StackPanel myStackPanel = new StackPanel();
             myStackPanel.Orientation = Orientation.Vertical;
-            myStackPanel.Height = 200;
+            myStackPanel.Height = _height;
+            myStackPanel.Width = _width;
             myStackPanel.VerticalAlignment = VerticalAlignment.Top;
             myStackPanel.HorizontalAlignment = HorizontalAlignment.Center;
 
@@ -75,24 +75,90 @@ namespace _2dFractal
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
             //Update the color array with new random colors
-            Random value = new Random();
-            value.NextBytes(_colorArray);
+            //Random value = new Random();
+            //value.NextBytes(_colorArray);
+
+            var calcService = new CalculationService();
+
+            //calcService.GetPointColour();
+
+            var bytesToDraw = new byte[_arraySize];
+
+            var pixels = new byte[_width][];
+
+            for (int i = 0; i < _width; i++)
+            {
+
+                for (int j = 0; j < _height; j++)
+                {
+                    if (j == 599)
+                    {
+                        var kuagefjeah = "";
+                    }
+                    SetPointColour(calcService.GetPointColour(), i, j, bytesToDraw);
+                }
+            }
+
 
             //Update writeable bitmap with the colorArray to the image.
-            _wb.WritePixels(_rect, _colorArray, _stride, 0);
+            _wb.WritePixels(_rect, bytesToDraw, _stride, 0);
+
+
+            for (int i = 0; i < _arraySize; i++)
+            {
+                if (bytesToDraw[i] == 0)
+                {
+                    var vaegaeg = "";
+                }
+    
+            }
 
             //Set the Image source.
             _random.Source = _wb;
 
         }
 
+        private void SetPointColour(Color colorToSet, int xcoor,int ycoor, byte[] arrayToColour)
+        {
+            //
+            var arrayIndex = xcoor * ycoor * _bytesPerPixel;
+            if (xcoor != 0)
+            {
+                arrayIndex = arrayIndex*xcoor;
+            }
+            if (ycoor != 0)
+            {
+                arrayIndex = arrayIndex * ycoor;
+            }
+
+            if (ycoor == 0 && xcoor == 0)
+            {
+                arrayIndex = 0;
+            }
+
+            if (arrayIndex == 2400)
+            {
+                var test = "";
+            }
+
+            arrayToColour[arrayIndex    ] = colorToSet.B;
+            arrayToColour[arrayIndex + 1] = colorToSet.G;
+            arrayToColour[arrayIndex + 2] = colorToSet.R;
+            arrayToColour[arrayIndex + 3] = colorToSet.A;
+        }
+
+        private const int _width = 600;
+        private const int _height = 600;
+
+
         private Image _random = new Image();
         // Create the writeable bitmap will be used to write and update.
         private static WriteableBitmap _wb =
-            new WriteableBitmap(100, 100, 96, 96, PixelFormats.Bgra32, null);
+            new WriteableBitmap(_width, _height, 96, 96, PixelFormats.Bgra32, null);
         // Define the rectangle of the writeable image we will modify. 
         // The size is that of the writeable bitmap.
         private static Int32Rect _rect = new Int32Rect(0, 0, _wb.PixelWidth, _wb.PixelHeight);
+
         // Calculate the number of bytes per pixel. 
         private static int _bytesPerPixel = (_wb.Format.BitsPerPixel + 7) / 8;
         // Stride is bytes per pixel times the number of pixels.
