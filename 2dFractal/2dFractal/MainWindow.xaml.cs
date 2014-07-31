@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -59,12 +60,12 @@ namespace _2dFractal
             // Add the StackPanel as the Content of the Parent Window Object
             mainWindow.Content = myStackPanel;
             mainWindow.Show();
-
+            dispatcherTimer_Tick(null, null);
             // DispatcherTimer setup
             // The DispatcherTimer will be used to update _random every
             //    second with a new random set of colors.
             DispatcherTimer dispatcherTimer = new DispatcherTimer();
-            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+            //dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
             dispatcherTimer.IsEnabled = true;
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
             dispatcherTimer.Start();
@@ -78,79 +79,54 @@ namespace _2dFractal
             //Random value = new Random();
             //value.NextBytes(_colorArray);
 
-            var calcService = new CalculationService();
+            var calcService = new CalculationService(_width, _height);
 
             //calcService.GetPointColour();
 
             var bytesToDraw = new byte[_arraySize];
 
             var pixels = new byte[_width][];
+            
+            var pixelss = new ConcurrentDictionary<Point, Color>();
 
             for (int i = 0; i < _width; i++)
             {
-
                 for (int j = 0; j < _height; j++)
                 {
-                    if (j == 599)
-                    {
-                        var kuagefjeah = "";
-                    }
-                    SetPointColour(calcService.GetPointColour(), i, j, bytesToDraw);
+                    var point = new Point(i, j);
+                    pixelss.TryAdd(point, calcService.GetPointColour(point));
                 }
             }
 
+            var byteCounter = 0;
 
+            for (int i = 0; i < _width; i++)
+            {
+                for (int j = 0; j < _height; j++)
+                {
+                    var point = new Point(i, j);
+                    bytesToDraw[byteCounter] = pixelss[point].B;
+                    byteCounter++;
+                    bytesToDraw[byteCounter] = pixelss[point].G;
+                    byteCounter++;
+                    bytesToDraw[byteCounter] = pixelss[point].R;
+                    byteCounter++;
+                    bytesToDraw[byteCounter] = pixelss[point].A;
+                    byteCounter++;
+                }
+            }
+            
             //Update writeable bitmap with the colorArray to the image.
             _wb.WritePixels(_rect, bytesToDraw, _stride, 0);
-
-
-            for (int i = 0; i < _arraySize; i++)
-            {
-                if (bytesToDraw[i] == 0)
-                {
-                    var vaegaeg = "";
-                }
-    
-            }
-
+            
             //Set the Image source.
             _random.Source = _wb;
 
         }
 
-        private void SetPointColour(Color colorToSet, int xcoor,int ycoor, byte[] arrayToColour)
-        {
-            //
-            var arrayIndex = xcoor * ycoor * _bytesPerPixel;
-            if (xcoor != 0)
-            {
-                arrayIndex = arrayIndex*xcoor;
-            }
-            if (ycoor != 0)
-            {
-                arrayIndex = arrayIndex * ycoor;
-            }
-
-            if (ycoor == 0 && xcoor == 0)
-            {
-                arrayIndex = 0;
-            }
-
-            if (arrayIndex == 2400)
-            {
-                var test = "";
-            }
-
-            arrayToColour[arrayIndex    ] = colorToSet.B;
-            arrayToColour[arrayIndex + 1] = colorToSet.G;
-            arrayToColour[arrayIndex + 2] = colorToSet.R;
-            arrayToColour[arrayIndex + 3] = colorToSet.A;
-        }
-
         private const int _width = 600;
         private const int _height = 600;
-
-
+        
         private Image _random = new Image();
         // Create the writeable bitmap will be used to write and update.
         private static WriteableBitmap _wb =
