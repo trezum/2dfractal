@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,57 +24,34 @@ namespace _2dFractal
             _widthHalf = width / 2;
             _height = height;
             _heightHalf = height / 2;
-            _iterations = 10;
+            _iterations = 100;
         }
 
         public Color GetPointColour(Point point)
         {
             Point p = TranslatePoint(point);
 
-            if (p.X*p.X + p.Y*p.Y > 4)
-            {
-                return Color.FromRgb(0, 0, 0);
-            }
             if (IsPointInSet(p))
             {
                 return Color.FromRgb(0, 0, 0);
             }
-
-            
-
-
             return Color.FromRgb(200, 0, 0);
-
-            
         }
 
         private bool IsPointInSet(Point point)
         {
-            var xZ = DoIteration(0, point.X);
-            var yZ = DoIteration(0, point.Y);
+            var input = new Complex(point.X,point.Y);
+            var result = new Complex(0, 0);
             for (int i = 0; i < _iterations; i++)
             {
-                xZ = DoIteration(xZ, point.X);
-                yZ = DoIteration(yZ, point.Y);
-
-                if (xZ*xZ + yZ*yZ < 4)
+                if (result.Magnitude > 4)
                 {
-                    return true;
+                    return false;
                 }
+                result = result*result + input;
             }
-            return false;
+            return true;
         }
-
-        //z is the result, length of the imaginary number.
-        //c is the input to the function
-        private double DoIteration(double z, double c)
-        {
-            return z * z + c;
-        }
-
-    
-        
-
 
         private Point TranslatePoint(Point p)
         {
@@ -100,6 +78,5 @@ namespace _2dFractal
 
             return new Point(x,y);
         }
-
     }
 }
