@@ -1,23 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using Image = System.Windows.Controls.Image;
-using PixelFormat = System.Drawing.Imaging.PixelFormat;
-using Rectangle = System.Drawing.Rectangle;
 
 namespace _2dFractal
 {
@@ -94,7 +83,13 @@ namespace _2dFractal
                 for (int j = 0; j < _height; j++)
                 {
                     var point = new Point(i, j);
-                    pixelss.TryAdd(point, calcService.GetPointColour(point));
+
+                    //pixelss.TryAdd(point, calcService.GetPointColour(point));
+                    Task.Factory.StartNew(() =>
+                    {
+                        pixelss.TryAdd(point, calcService.GetPointColour(point));
+                    });
+                    
                 }
             }
 
@@ -124,8 +119,8 @@ namespace _2dFractal
 
         }
 
-        private const int _width = 600;
-        private const int _height = 600;
+        private const int _width = 800;
+        private const int _height = 800;
         
         private Image _random = new Image();
         // Create the writeable bitmap will be used to write and update.
