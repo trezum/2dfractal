@@ -1,4 +1,6 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 
@@ -14,10 +16,10 @@ namespace _2dFractal
         {
             _widthHalf = width / 2;
             _heightHalf = height / 2;
-            _iterations = 100;
+            _iterations = 40;
         }
 
-        public Color GetPointColour(Point point)
+        public Color GetPointColourOld(Point point)
         {
             Point p = TranslatePoint(point);
 
@@ -26,6 +28,39 @@ namespace _2dFractal
                 return Color.FromRgb(0, 0, 0);
             }
             return Color.FromRgb(200, 0, 0);
+        }
+
+
+        public Color GetPointColour(Point point)
+        {
+            Point p = TranslatePoint(point);
+
+
+            var forEscape = IterationsForEscape(p);
+            if (forEscape != _iterations && forEscape > 10)
+            {
+                var test = "";
+            }
+            var result = forEscape * 255 / _iterations;
+
+            byte b = Convert.ToByte(result);
+            
+            return Color.FromRgb(b,b,b);
+        }
+
+        private int IterationsForEscape(Point point)
+        {
+            var input = new Complex(point.X, point.Y);
+            var result = new Complex(0, 0);
+            for (int i = 0; i < _iterations; i++)
+            {
+                if (result.Magnitude > 2)
+                {
+                    return i;
+                }
+                result = result * result + input;
+            }
+            return _iterations;
         }
 
         private bool IsPointInSet(Point point)
@@ -42,6 +77,9 @@ namespace _2dFractal
             }
             return true;
         }
+
+
+
 
         private Point TranslatePoint(Point p)
         {

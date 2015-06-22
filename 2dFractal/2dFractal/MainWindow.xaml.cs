@@ -119,8 +119,8 @@ namespace _2dFractal
 
         }
 
-        private const int _width = 800;
-        private const int _height = 800;
+        private const int _width = 1000;
+        private const int _height = 1000;
         
         private Image _random = new Image();
         // Create the writeable bitmap will be used to write and update.
